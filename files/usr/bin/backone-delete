@@ -1,0 +1,47 @@
+#!/bin/ash
+
+if [ "x${1}" == "x" ]
+then
+	echo "Require Network ID"
+	exit 0
+fi
+
+NETID=${1}
+
+NETADDR=`backone-cli listnetworks | grep ${NETID} | awk '{print $(NF - 1)}'`
+
+if [ "x${NETADDR}" == "x" ]
+then
+	NETADDR=`backone-cli listnetworks | grep ${NETID} | awk '{print $(NF - 1)}'`
+fi
+
+if [ "x${NETADDR}" == "x" ]
+then
+	printf "Network ID is invalid!\n"
+	exit 0
+fi
+
+printf "Deleting Network ID ${NETID}..."
+backone-cli leave ${NETID} > /dev/null 2>&1
+sleep 1
+
+BOID=`echo ${NETID} | cut -c12-16`
+BOADDR="bo_${BOID}"
+
+uci del network.${BOADDR}
+uci commit
+
+/etc/init.d/network reload
+sleep 1
+#/etc/init.d/backone restart
+#sleep 1
+
+# Firewall
+uci del_list firewall.@zone[2].network=${BOADDR}
+uci commit
+/etc/init.d/firewall reload
+
+
+printf "Done!\n"
+echo
+echo "Removing Interface ${BOADDR}"

@@ -1,0 +1,36 @@
+#!/bin/ash
+
+
+SERIALNUMBER=""
+
+if [ -f /etc/config/glconfig ]
+then
+	SERIALNUMBER=`uci get glconfig.general.factory_sn`
+
+fi
+
+MACADDRESS=`ip -j addr show wan 2>&1 | jsonfilter -q -e '@[0]["address"]' | sed 's/://g'`
+
+if [ "x$MACADDRESS" == "x" ]
+then
+	MACADDRESS=`ip -j addr show eth0 2>&1 | jsonfilter -q -e '@[0]["address"]' | sed 's/://g'`
+fi
+
+if [ "x$SERIALNUMBER" == "x" ]
+then
+	SERIALNUMBER=${MACADDRESS}
+else
+	SERIALNUMBER="${MACADDRESS}/${SERIALNUMBER}"
+fi
+
+#if [ "x$SERIALNUMBER" == "x" ]
+#then
+#	SERIALNUMBER=`ip -j addr show wan 2>&1 | jsonfilter -q -e '@[0]["address"]' | sed 's/://g'`
+#fi
+
+#if [ "x$SERIALNUMBER" == "x" ]
+#then
+#	SERIALNUMBER=`ip -j addr show eth0 2>&1 | jsonfilter -q -e '@[0]["address"]' | sed 's/://g'`
+#fi
+
+echo $SERIALNUMBER

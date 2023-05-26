@@ -1,0 +1,6 @@
+FILE="files"
+PROFILE="ubnt_edgerouter-x"
+EXTRA_IMAGE_NAME="backone_bvn-ubnt_edgerouter_x"
+PACKAGES="luci bash backone zabbix-agentd curl mosquitto-client-ssl sqm-scripts luci-app-sqm libmbedtls rtty-nossl luci-theme-material luci-app-commands luci-app-acl -mwan3 -luci-app-mwan3"
+
+make image PROFILE="ubnt_edgerouter-x" EXTRA_IMAGE_NAME="backone_bvn" PACKAGES="bash zabbix-agentd curl mosquitto-client-ssl sqm-scripts luci-app-sqm libmbedtls rtty-nossl luci luci-theme-material luci-app-commands luci-app-acl backone -mwan3 -luci-app-mwan3" FILES="files"

@@ -1,0 +1,5 @@
+#!/bin/ash
+
+uci set system.@system[0].hostname="${1}"
+uci commit
+/etc/init.d/system reload

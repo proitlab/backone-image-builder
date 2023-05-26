@@ -1,0 +1,21 @@
+#!/bin/sh /etc/rc.common
+
+START=99
+
+USE_PROCD=1
+NAME=mqtt_rcall_worker
+PROG=/usr/bin/mqtt_rcall_worker
+
+start_service() {
+	procd_open_instance
+	procd_set_param command "$PROG"
+	procd_close_instance
+}
+
+reload_service() {
+	procd_send_signal $PROG
+}
+
+stop_service() {
+	killall mosquitto_sub
+}

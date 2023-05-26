@@ -1,0 +1,8 @@
+#!/bin/ash
+
+
+while true
+do
+	/usr/bin/mqtt_presence mqtt.backone.cloud > /dev/null 2>&1
+	sleep 600
+done

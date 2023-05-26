@@ -1,0 +1,54 @@
+#!/bin/ash
+
+if [ "x${1}" == "x" ]
+then
+	echo "Require Network ID"
+	exit 0
+fi
+
+NETID=${1}
+
+printf  "Adding Network ID ${NETID}..."
+backone-cli join ${NETID} > /dev/null 2>&1
+sleep 1
+
+NETADDR=`backone-cli listnetworks | grep ${NETID} | awk '{print $(NF - 1)}'`
+
+if [ "x${NETADDR}" == "x" ]
+then
+	NETADDR=`backone-cli listnetworks | grep ${NETID} | awk '{print $(NF - 1)}'`
+	sleep 1
+fi
+
+if [ "x${NETADDR}" == "x" ]
+then
+	NETADDR=`backone-cli listnetworks | grep ${NETID} | awk '{print $(NF - 1)}'`
+	printf "Network ID is invalid!\n"
+	exit 0
+fi
+
+BOID=`echo ${NETID} | cut -c12-16`
+BOADDR="bo_${BOID}"
+
+uci set network.${BOADDR}=interface
+uci set network.${BOADDR}.proto='none'
+uci set network.${BOADDR}.device="${NETADDR}"
+uci commit
+
+/etc/init.d/network reload
+sleep 1
+
+# Firewall
+uci add_list firewall.@zone[2].network=${BOADDR}
+uci commit
+/etc/init.d/firewall reload
+
+#/etc/init.d/backone restart
+#sleep 1
+
+printf "Done!\n"
+
+backone-cli listnetworks | grep ${NETID} 
+
+echo
+echo "Adding Interface ${BOADDR}"

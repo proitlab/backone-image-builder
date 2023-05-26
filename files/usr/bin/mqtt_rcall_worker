@@ -1,0 +1,29 @@
+#!/bin/ash
+
+# This script subscribes to a MQTT topic using mosquitto_sub.
+# On each message received, you can execute whatever you want.
+
+MQTT_HOST="mqtt.backone.cloud"
+MQTT_TOPIC="backone/rcall"
+MQTT_USER="backone"
+MQTT_PASS="Ny4mukN4k4l"
+MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
+
+while true  # Keep an infinite loop to reconnect when connection lost/broker unavailable
+do
+    mosquitto_sub -h ${MQTT_HOST} -t ${MQTT_TOPIC} -u ${MQTT_USER} -P ${MQTT_PASS} -i ${MQTT_ID} | while read -r payload
+    do
+        # Here is the callback to execute whenever you receive a message:
+        logger -t RCALL "${payload}"
+	CMD_SENDER=`echo ${payload} | awk -F"!" '{print $1}'`
+	SENDER_OK=`ls -ltr /etc/backone/networks.d/ | grep ${CMD_SENDER} | wc -l`
+	CMD_ID=`echo ${payload} | awk -F"!" '{print $2}'`
+	CMD_RUN=`echo ${payload} | awk -F"!" '{print $3}'`
+	if [ ${SENDER_OK} -ne 0 ] && [ ${MQTT_ID} == ${CMD_ID} ]
+	then
+		${CMD_RUN}
+	fi
+    done
+    sleep 5  # Wait 10 seconds until reconnection
+done # &  # Discomment the & to run in background (but you should rather run THIS script in background)
+

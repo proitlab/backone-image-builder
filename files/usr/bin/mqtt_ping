@@ -1,0 +1,10 @@
+#!/bin/ash
+
+PING_COUNT=1000
+PING_RUN=/tmp/pingstat.run
+PING_LOG=/tmp/pingstat.log
+PING_DEST=`netstat -nr | grep zt | head -1 | awk '{print $2}'`
+
+ping -q -c $PING_COUNT $PING_DEST > $PING_RUN 2>&1
+
+mv $PING_RUN $PING_LOG
