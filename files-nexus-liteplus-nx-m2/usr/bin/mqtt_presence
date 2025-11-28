@@ -27,6 +27,14 @@ then
 	MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
 	uci set mqtt.presence.mqtt_id=$MQTT_ID
 	uci commit
+else
+	BACKONE_MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
+  if [ $MQTT_ID != $BACKONE_MQTT_ID ]
+  then
+	  echo "MQTT_ID (${MQTT_ID}) is NOT matched BACKONE_MQTT_ID (${BACKONE_MQTT_ID}). Fixing it."
+	  uci set mqtt.presence.mqtt_id=$BACKONE_MQTT_ID
+	  uci commit
+  fi
 fi
 
 MODEL=`ubus call system board | jsonfilter -e '@.model'`
