@@ -42,18 +42,18 @@ config internal 'diag'
 
 config command
         option param '0'
-        option name 'BackOne Status'
-        option command 'backone-show'
+        option name 'Nexus Status'
+        option command 'nexus-show'
 
 config command
 	option param '1'
-	option name 'BackOne Add Network'
-	option command 'backone-add'
+	option name 'Nexus Add Network'
+	option command 'nexus-add'
 
 config command
 	option param '1'
-	option name 'BackOne Delete Network'
-	option command 'backone-delete'
+	option name 'Nexus Delete Network'
+	option command 'nexus-delete'
 
 config command
 	option name 'Set Hostname'
@@ -67,26 +67,26 @@ config command
 
 config command
 	option name 'WAF Set UUID'
-	option command 'backone_waf_uuid'
+	option command 'nexus_waf_uuid'
 	option param '1'
 
 config command
 	option name 'WAF Set API'
-	option command 'backone_waf_api'
+	option command 'nexus_waf_api'
 	option param '1'
 
 config command
 	option name 'WAF Show List'
-	option command 'backone_waf_list'
+	option command 'nexus_waf_list'
 	option param '0'
 
 config command
 	option name 'WAF On (Add FW Redirection)'
-	option command 'backone_waf_on'
+	option command 'nexus_waf_on'
 	option param '0'
 
 config command
 	option name 'WAF Off (Delete FW Redirection)'
-	option command 'backone_waf_off'
+	option command 'nexus_waf_off'
 	option param '0'
 
