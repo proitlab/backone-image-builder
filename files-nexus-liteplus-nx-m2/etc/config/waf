@@ -1,0 +1,3 @@
+config waf 'global'
+        option waf_api 'https://manage.backone.cloud/api/webfilters'
+        option uuid '5a265f80-e993-40fa-98d3-5875eabfc061'

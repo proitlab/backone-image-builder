@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Removing redirect rule WAF DNS..."
+uci delete firewall.@redirect[-1]
+uci commit
+
+/etc/init.d/firewall restart
+service backone_waf_worker disable
+/etc/init.d/backone_waf_worker stop

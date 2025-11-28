@@ -1,0 +1,5 @@
+#!/bin/bash
+
+uci set waf.global.uuid=${1}
+uci commit
+

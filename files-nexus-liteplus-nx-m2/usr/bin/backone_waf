@@ -1,0 +1,80 @@
+#!/bin/bash
+
+MEMBER_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
+UUID=`uci get waf.global.uuid`
+NETWORK_ID=`uci get waf.global.network`
+WAF_API=`uci get waf.global.waf_api`
+BLACK_LIST=/etc/adblock/adblock.blacklist
+WHITE_LIST=/etc/adblock/adblock.whitelist
+WAF_LIST=/tmp/backone_waf.list
+
+#URI_API=${WAF_API}${UUID}/
+#URI_API=${WAF_API}/member/${MEMBER_ID}/
+
+if [ "x${NETWORK_ID}" == "x" ]
+then
+        logger -p notice -t backone_waf "NETWORK_ID is empty. Try to get from backone-cli!"
+        NETWORK_ID=`backone-cli listnetworks | tail -1 | grep "OK PRIVATE" | awk '{print $3}'`
+fi
+
+if [ "x${NETWORK_ID}" == "x" ]
+then
+        logger -p err -t backone_waf "NETWORK_ID is empty. Please define network or join network!"
+        exit 0;
+fi
+
+URI_API=${WAF_API}/network/${NETWORK_ID}/
+
+curl -s -o ${WAF_LIST} ${URI_API}
+
+if [[ -z $(grep '[^[:space:]]' ${WAF_LIST} ) ]]
+then
+	IS_BLACKLIST='9'
+else
+        IS_BLACKLIST=`head -1 ${WAF_LIST}`
+fi
+
+if [ ${IS_BLACKLIST} != '1' ] && [ ${IS_BLACKLIST} != '0' ]
+then
+        logger -p err -t backone_waf "Failure. Not correct list!"
+        exit 0;
+fi
+
+# Remove first Line
+sed -i '1d' ${WAF_LIST}
+
+# Clean Up from BackOne Domain
+sed -i '/backone.cloud/d' ${WAF_LIST}
+
+#echo ${IS_BLACKLIST}
+#cat ${WAF_LIST}
+
+if [ ${IS_BLACKLIST} == '0' ]
+then
+        ADBLOCK_LIST=${BLACK_LIST}
+        echo "atleastonewhitelistdomain.com" > ${WHITE_LIST}
+else
+        ADBLOCK_LIST=${WHITE_LIST}
+        echo "atleastoneblacklistdomain.com" > ${BLACK_LIST}
+
+        # White List ALL BackOne Domain
+	echo "backone.cloud"    >> ${WAF_LIST}
+fi
+
+#logger -p notice -t backone_waf "Use ${ADBLOCK_LIST}"
+
+if [[ -z $(grep '[^[:space:]]' ${ADBLOCK_LIST} ) ]]
+then
+        logger -p notice -t backone_waf "${ADBLOCK_LIST} is empty! Filled it first."
+        echo "atleastonedomainlistforemptyfile.com" > ${ADBLOCK_LIST}
+fi
+
+IS_NEW=`cmp ${ADBLOCK_LIST} ${WAF_LIST} 2>&1 | grep ${ADBLOCK_LIST} | grep ${WAF_LIST} | wc -l`
+
+if [ ${IS_NEW} == 1 ]
+then
+        logger -p notice -t backone_waf "New List! Update ${ADBLOCK_LIST} from ${WAF_LIST}"
+        cp -f ${WAF_LIST} ${ADBLOCK_LIST}
+        /etc/init.d/adblock restart
+fi
+

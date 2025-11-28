@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+ADBLOCK_STATUS=`/etc/init.d/adblock status | grep adblock_status | grep enable | wc -l`
+FW_STATUS=`uci get firewall.@redirect[-1].name | grep WAF | wc -l`
+
+if [ ${ADBLOCK_STATUS} == 1 ] && [ ${FW_STATUS} == 1 ]
+then
+        echo 1
+else
+        echo 0
+fi

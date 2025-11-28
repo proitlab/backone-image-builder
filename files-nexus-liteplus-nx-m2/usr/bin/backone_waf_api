@@ -1,0 +1,5 @@
+#!/bin/bash
+
+uci set waf.global.waf_api=${1}
+uci commit
+

@@ -1,0 +1,22 @@
+#!/bin/ash
+
+SPORT=""
+
+if [ -f /sbin/swconfig ]
+then
+        SPORT=`swconfig list | cut -d '-' -f 2 | sed 's/^ //g'`
+
+        for i in `ifconfig | grep "^eth" | grep -v "^$SPORT" | cut -d ' ' -f 1`
+        do
+                STATUS=`ethtool $i | grep "Link detected" | cut -d ':' -f 2 | sed 's/^ //g'`
+                printf "${i}->${STATUS}, "
+        done | sed 's/, $//g'
+
+else
+        for i in `ifconfig | grep "^eth" | cut -d ' ' -f 1`
+        do
+                STATUS=`ethtool $i | grep "Link detected" | cut -d ':' -f 2 | sed 's/^ //g'`
+                printf "${i}->${STATUS}, "
+        done | sed 's/, $//g'
+
+fi

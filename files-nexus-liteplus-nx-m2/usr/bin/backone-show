@@ -1,0 +1,8 @@
+#!/bin/ash
+
+backone-cli info
+echo
+backone-cli listnetworks
+echo
+backone-cli peers
+echo

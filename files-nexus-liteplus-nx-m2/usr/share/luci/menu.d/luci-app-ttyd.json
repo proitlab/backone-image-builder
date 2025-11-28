@@ -1,0 +1,22 @@
+{
+	"admin/services/ttyd": {
+		"title": "Routing Protocol",
+		"action": {
+			"type": "firstchild"
+		},
+		"depends": {
+			"acl": [ "luci-app-ttyd" ],
+			"uci": { "ttyd": true }
+		}
+	},
+
+	"admin/services/ttyd/ttyd": {
+		"title": "Config",
+		"order": 1,
+		"action": {
+			"type": "view",
+			"path": "ttyd/term"
+		}
+	}
+
+}

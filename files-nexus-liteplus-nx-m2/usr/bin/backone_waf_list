@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "Black List"
+echo "----------"
+cat /etc/adblock/adblock.blacklist
+
+echo
+echo
+echo
+
+echo "White List"
+echo "----------"
+cat /etc/adblock/adblock.whitelist

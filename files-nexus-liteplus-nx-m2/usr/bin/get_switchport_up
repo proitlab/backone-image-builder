@@ -1,0 +1,12 @@
+#!/bin/ash
+
+IS_MIKROTIK=`ubus call system board | jsonfilter -e '@.model' | grep -i mikrotik | wc -l`
+
+
+if [ ${IS_MIKROTIK} -eq 1 ]
+then
+        for i in `swconfig dev switch0 show | grep link | grep "link:up" | cut -d ' ' -f 2 | cut -d ':' -f 2`; do printf "$i,"; done | sed 's/,$//g' | sed 's/,[5-9].*$//g' | sed 's/0,//g'
+else
+        for i in `swconfig dev switch0 show | grep link | grep "link:up" | cut -d ' ' -f 2 | cut -d ':' -f 2`; do printf "$i,"; done | sed 's/,$//g' | sed 's/,[5-9].*$//g' | sed 's/[5-9]//g'
+fi
+

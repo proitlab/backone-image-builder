@@ -1,0 +1,6 @@
+
+config ttyd
+	option interface 'br-lan'
+	option command '/usr/bin/vtysh'
+	option debug '7'
+

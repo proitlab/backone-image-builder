@@ -1,0 +1,15 @@
+#!/bin/ash
+
+PING_COUNT=1000
+PING_RUN=/tmp/pingstat.run
+PING_LOG=/tmp/pingstat.log
+if [ "x$1" == "x" ]
+then
+	PING_DEST=`netstat -nr | grep zt | head -1 | awk '{print $2}'`
+else
+        PING_DEST="$1"
+fi
+
+ping -q -c $PING_COUNT $PING_DEST > $PING_RUN 2>&1
+
+mv $PING_RUN $PING_LOG

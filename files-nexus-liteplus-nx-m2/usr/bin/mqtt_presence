@@ -1,0 +1,75 @@
+#!/bin/ash
+
+if [ "x$1" == "x" ]
+then
+	MQTT_SERVER="mqtt.backone.cloud"
+else
+	MQTT_SERVER="$1"
+fi
+
+MQTT_TOPIC="backone/presence"
+MQTT_USER="backone"
+MQTT_PASS="Ny4mukN4k4l"
+MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
+
+MODEL=`ubus call system board | jsonfilter -e '@.model'`
+BOARD_NAME=`ubus call system board | jsonfilter -e '@.board_name'`
+RELEASE_VERSION=`ubus call system board | jsonfilter -e '@.release.version'`
+RELEASE_TARGET=`ubus call system board | jsonfilter -e '@.release.target'`
+
+#OVPN_IPADDR=`find /tmp/openvpn.log -type f -mmin -1000 -exec cat {} \; | grep net_addr_v4_add`
+#OVPN_IPADDR=`ip addr show dev tun0 | grep inet | grep tun0 | awk '{print $2}' | awk -F"/" '{print $1}'`
+OVPN_IPADDR=`ip -j addr show tun0 2>&1 | jsonfilter -q -e '@[0]["addr_info"][0].local'`
+MQTT_RCALL=`ps | grep mqtt_rcall | grep -v grep | wc -l`
+UPTIME=`uptime`
+SERIALNUMBER=`get_serialnumber`
+NUM_CORE=`cat /proc/cpuinfo | grep processor | wc -l`
+MEMORY_USAGE=`free | grep Mem | awk '{print $3/$2 * 100.0}'`
+
+PING_LOG='/tmp/pingstat.log'
+
+PACKET_LOSS=''
+ROUND_TRIP=''
+if [ -f $PING_LOG ]
+then
+	PACKET_LOSS=`cat $PING_LOG | grep "packet loss"`
+	ROUND_TRIP=`cat $PING_LOG | grep "round-trip"`
+
+fi
+
+if [ -f /usr/bin/get_switchport_up ]
+then
+	SWITCHPORT_UP=`get_switchport_up`
+fi
+
+if [ -f /usr/bin/get_port_status ]
+then
+	PORT_STATUS=`get_port_status`
+fi
+
+if [ -f /usr/bin/get_vnstat ]
+then
+	VNSTAT_INFO=`get_vnstat`
+fi
+
+IPADDRESS_TS=`ip a show tailscale0 | grep "inet " | awk '{print $2}' | awk -F"/" '{print $1}'`
+
+# IS_WAF
+if [ -f /usr/bin/backone_waf_check ]
+then
+	IS_WAF=`backone_waf_check`
+fi
+
+# RSSI
+RSSI_SIGNAL=99999
+if [ -f /usr/bin/get_signal_rssi ]
+then
+	RSSI_SIGNAL=`get_signal_rssi`
+fi
+
+
+#MQTT_MESSAGE="$MQTT_ID;$MODEL;$BOARD_NAME;$RELEASE_VERSION;$RELEASE_TARGET;$OVPN_IPADDR;$MQTT_RCALL;$UPTIME;$SERIALNUMBER;$NUM_CORE;$MEMORY_USAGE;$PACKET_LOSS;$ROUND_TRIP;"
+MQTT_MESSAGE="$MQTT_ID;$MODEL;$BOARD_NAME;$RELEASE_VERSION;$RELEASE_TARGET;$OVPN_IPADDR;$MQTT_RCALL;$UPTIME;$SERIALNUMBER;$NUM_CORE;$MEMORY_USAGE;$PACKET_LOSS;$ROUND_TRIP;$SWITCHPORT_UP;$PORT_STATUS;$VNSTAT_INFO;$IPADDRESS_TS;$IS_WAF;$RSSI_SIGNAL;$HOSTNAME"
+echo "${MQTT_MESSAGE} -> $MQTT_SERVER"
+
+mosquitto_pub  -h $MQTT_SERVER -t "$MQTT_TOPIC" -u $MQTT_USER -P $MQTT_PASS -i $MQTT_ID -m "$MQTT_MESSAGE"

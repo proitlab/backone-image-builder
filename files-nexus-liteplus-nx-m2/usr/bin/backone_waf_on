@@ -1,0 +1,33 @@
+#!/bin/bash
+
+FWNAME=`uci get firewall.@redirect[-1].name`
+RULENAME="WAF-DNS"
+
+if [ "x${FWNAME}" != "x${RULENAME}" ]
+then
+        echo "Setting Firewall Rule for redirection (${RULENAME})"
+	logger -p notice -t backone_waf_on "Setting Firewall Rule for redirection (${RULENAME})"
+
+	uci add firewall redirect
+	uci set firewall.@redirect[-1].target='DNAT'
+	uci set firewall.@redirect[-1].name="${RULENAME}"
+	uci set firewall.@redirect[-1].src='lan'
+	uci set firewall.@redirect[-1].src_dport='53'
+	uci set firewall.@redirect[-1].dest_port='53'
+	uci set firewall.@redirect[-1].family='any'
+	uci set firewall.@redirect[-1].proto='tcp udp'
+
+	uci set dhcp.@dnsmasq[-1].localservice=0
+
+	uci commit
+
+	/etc/init.d/firewall restart
+	/etc/init.d/dnsmasq restart
+	service backone_waf_worker enable
+	/etc/init.d/backone_waf_worker start
+
+else
+	echo "Firewall Rule for redirection already exist (${RULENAME})"
+	logger -p notice -t backone_waf_on "Firewall Rule for redirection already exist (${RULENAME})"
+fi
+
