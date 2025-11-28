@@ -13,3 +13,8 @@
 
 # Compile option in make menuconfig
     Check make_menuconfig.png
+
+# Installer
+curl -o installer.sh https://install.backone.cloud/nexus/liteplus-nx-m2/installer.sh
+chmod 755 installer.sh
+./installer.sh
