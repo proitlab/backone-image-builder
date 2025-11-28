@@ -15,4 +15,5 @@
     Check make_menuconfig.png
 
 # Installer
-Install with Image Builder 23.05.2
+- Install with Image Builder 23.05.2
+- Use custom repo for nexus and netify packages
