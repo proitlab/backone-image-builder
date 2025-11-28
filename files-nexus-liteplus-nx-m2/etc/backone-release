@@ -1,4 +1,4 @@
 . /etc/os-release
 
 BACKONE_MODEL="${NAME} Lite+ NX-M2"
-BACKONE_BOARD_NAME="{ID}-liteplus-nx-m2"
+BACKONE_BOARD_NAME="${ID}-liteplus-nx-m2"
