@@ -2,15 +2,32 @@
 
 if [ "x$1" == "x" ]
 then
-	MQTT_SERVER="mqtt.backone.cloud"
+	MQTT_SERVER=`uci get mqtt.presence.mqtt_server`
+	if [ "x$MQTT_SERVER" == "x" ]
+	then
+		echo "Please define the mqtt service in /etc/config/mqtt"
+		exit 0;
+	fi
 else
 	MQTT_SERVER="$1"
 fi
 
-MQTT_TOPIC="backone/presence"
-MQTT_USER="backone"
-MQTT_PASS="Ny4mukN4k4l"
-MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
+MQTT_TOPIC=`uci get mqtt.presence.mqtt_topic`
+if [ "x$MQTT_TOPIC" == "x" ]
+then
+	echo "MQTT_TOPIC is not define in /etc/config/mqtt. Used default"
+	MQTT_TOPIC="backone/presence"
+fi
+MQTT_USER=`uci get mqtt.presence.mqtt_user`
+MQTT_PASS=`uci get mqtt.presence.mqtt_pass`
+MQTT_ID=`uci get mqtt.presence.mqtt_id`
+if [ "x$MQTT_ID" == "x" ]
+then
+	echo "MQTT_ID is not define in /etc/config/mqtt. Get Id."
+	MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
+	uci set mqtt.presence.mqtt_id=$MQTT_ID
+	uci commit
+fi
 
 MODEL=`ubus call system board | jsonfilter -e '@.model'`
 BOARD_NAME=`ubus call system board | jsonfilter -e '@.board_name'`

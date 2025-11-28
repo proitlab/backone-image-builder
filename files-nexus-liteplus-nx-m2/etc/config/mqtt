@@ -1,0 +1,7 @@
+
+config mqtt 'presence'
+	option mqtt_server 'mqtt.backone.cloud'
+	option mqtt_port '1883'
+	option mqtt_topic 'nexus/presence'
+	option mqtt_id '62d344b64d'
+
