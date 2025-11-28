@@ -134,7 +134,7 @@ config rule
 	option name 'Allow-SDWan-Inbound UDP'
 
 config zone
-	option name 'backone'
+	option name 'nexus'
 	option input 'ACCEPT'
 	option output 'ACCEPT'
 	option forward 'ACCEPT'
@@ -144,10 +144,10 @@ config zone
 
 config forwarding
 	option src 'lan'
-	option dest 'backone'
+	option dest 'nexus'
 
 config forwarding
-	option src 'backone'
+	option src 'nexus'
 	option dest 'lan'
 
 config rule
