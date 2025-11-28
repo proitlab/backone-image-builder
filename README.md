@@ -9,3 +9,7 @@
 /etc/rc.local -> Model and Board Name
 /usr/share/luci/menu.d/luci-base.json -> Add menu SDWAN
 /etc/opkg/distfeeds.conf -> Custom Repo
+
+
+# Compile option in make menuconfig
+    Check make_menuconfig.png
