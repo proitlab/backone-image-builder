@@ -6,7 +6,7 @@ config system
 	option compat_version '1.1'
 	option timezone 'WIB-7'
 	option zonename 'Asia/Jakarta'
-	option hostname 'nexus-liteplus-nx-m2'
+	option hostname 'nexus-pro-nx-6'
 
 config timeserver 'ntp'
 	option enabled '1'
