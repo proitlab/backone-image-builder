@@ -13,6 +13,8 @@ opkg install bash zabbix-agentd curl mosquitto-client-ssl libmbedtls rtty-nossl 
 opkg install luci-theme-material luci-app-commands luci-app-acl wget-ssl ethtool adblock luci-app-vnstat usbutils kmod-usb-serial-option kmod-usb-serial-qualcomm kmod-usb-serial-wwan kmod-usb-serial kmod-usb-net-cdc-ether mwan3 luci-app-mwan3
 opkg install luci-app-backone
 
+# Remove some Packages
+opkg remove luci-i18n-samba-ru autosamba luci-app-samba
 
 # Do it again to make sure -> Extract the files
 tar -xvzf /tmp/files.tar.gz -C /
