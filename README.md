@@ -1,5 +1,5 @@
 # backone-image-builder
-## Nexus Lite + NX-M2
+## Nexus Pro + NX-6
 
 ## To building up custom image from OpenWrt
 
@@ -15,6 +15,4 @@
     Check make_menuconfig.png
 
 # Installer
-curl -o installer.sh https://install.backone.cloud/nexus/liteplus-nx-m2/installer.sh
-chmod 755 installer.sh
-./installer.sh
+Install with Image Builder 23.05.2

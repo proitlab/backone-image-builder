@@ -1,7 +1,7 @@
 #!/bin/ash
 
 # Download zip files
-curl -o /tmp/files.tar.gz https://install.backone.cloud/nexus/liteplus-nx-m2/files.tar.gz
+curl -o /tmp/files.tar.gz https://install.backone.cloud/nexus/pro-nx-6/files.tar.gz
 
 # Extract the files
 tar -xvzf /tmp/files.tar.gz -C /
