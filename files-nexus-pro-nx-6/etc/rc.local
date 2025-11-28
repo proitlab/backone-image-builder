@@ -1,5 +1,8 @@
 . /etc/backone-release
 
+# Netify NFT Rule to block
+nft -f /etc/nftables.d/10-netify.nft
+
 echo $BACKONE_MODEL > /tmp/sysinfo/model
 echo $BACKONE_BOARD_NAME > /tmp/sysinfo/board_name
 

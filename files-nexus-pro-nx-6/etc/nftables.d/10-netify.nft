@@ -1,0 +1,6 @@
+table inet nfa {
+ chain output {
+ type filter hook output priority 0; policy accept;
+ ip saddr . tcp dport . ip daddr @nfa_block.v4 drop
+ }
+}
