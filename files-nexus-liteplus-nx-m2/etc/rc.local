@@ -1,0 +1,6 @@
+. /etc/backone-release
+
+echo $BACKONE_MODEL > /tmp/sysinfo/model
+echo $BACKONE_BOARD_NAME > /tmp/sysinfo/board_name
+
+exit 0

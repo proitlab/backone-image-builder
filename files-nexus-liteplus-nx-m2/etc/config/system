@@ -6,7 +6,7 @@ config system
 	option compat_version '1.1'
 	option timezone 'WIB-7'
 	option zonename 'Asia/Jakarta'
-	option hostname 'backone-gateway'
+	option hostname 'nexus-liteplus-nx-m2'
 
 config timeserver 'ntp'
 	option enabled '1'
