@@ -6,6 +6,7 @@
 # ================================
 
 # --- EDIT THESE (UPDATED AS REQUESTED) ---
+ZTID="$(backone-cli info | awk '{print $3}')"
 ZTINF="$(ifconfig | grep zt | awk '{print $1}')"
 MYSERIALNUMBER="$(/usr/bin/get_serialnumber)"
 HOSTNAME="$(uci get system.@system[0].hostname)"
@@ -15,7 +16,7 @@ MODEL="$(ubus call system board | jsonfilter -e '@.model')"
 HOST="rtty.manage.backone.cloud"
 PORT="5912"
 TOKEN="dafc4fe50a0bc91555e689b19eae39ee"
-DESCRIPTION="${HOSTNAME}/${ZTIPADDR}/${MODEL}"
+DESCRIPTION="${HOSTNAME}/${ZTID}/${ZTIPADDR}/${MODEL}"
 
 # --- START ---
 echo "Mengecek konfigurasi RTTY..."
