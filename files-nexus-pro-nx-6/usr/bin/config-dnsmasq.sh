@@ -5,7 +5,11 @@ IS_PROBLEM=`nslookup google.com | grep "can't find" | wc -l`
 if [ ${IS_PROBLEM} -ne 0 ]
 then
   # Add Google to DNS List Server
-  uci add_list dhcp.@dnsmasq[0].server=8.8.8.8
-  uci commit dhcp
-  /etc/init.d/dnsmasq restart
+  IS_DNS=`uci get dhcp.@dnsmasq.server | grep 8.8.8.8 | wc -l`
+  if [ ${IS_DNS} -eq 0 ]
+  then
+    uci add_list dhcp.@dnsmasq[0].server=8.8.8.8
+    uci commit dhcp
+    /etc/init.d/dnsmasq restart
+  fi
 fi
