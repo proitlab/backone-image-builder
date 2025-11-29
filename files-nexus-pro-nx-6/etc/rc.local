@@ -6,6 +6,9 @@ nft -f /etc/nftables.d/10-netify.nft
 echo $BACKONE_MODEL > /tmp/sysinfo/model
 echo $BACKONE_BOARD_NAME > /tmp/sysinfo/board_name
 
+# Configurations
 /usr/bin/config-rtty.sh
+/usr/bin/config-dnsmasq.sh
+/usr/bin/config-dropbear.sh
 
 exit 0
