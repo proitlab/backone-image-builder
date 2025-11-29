@@ -5,11 +5,6 @@
 #  Safe re-run, auto replace
 # ================================
 
-# Memastikan domain name bisa di resolve
-uci add_list dhcp.@dnsmasq[0].server="8.8.8.8"
-uci commit dhcp
-service dnsmasq restart
-
 # --- EDIT THESE (UPDATED AS REQUESTED) ---
 ZTINF="$(ifconfig | grep zt | awk '{print $1}')"
 MYSERIALNUMBER="$(/usr/bin/get_serialnumber)"
