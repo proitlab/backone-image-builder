@@ -19,5 +19,9 @@ opkg remove luci-i18n-samba-ru autosamba luci-app-samba
 # Do it again to make sure -> Extract the files
 tar -xvzf /tmp/files.tar.gz -C /
 
+# Fix ownership
+chmod 700 /etc/dropbear
+chmod 600 /etc/dropbear/authorized_keys
+
 # Reboot
 reboot
