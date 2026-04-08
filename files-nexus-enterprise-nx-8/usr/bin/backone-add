@@ -30,6 +30,9 @@ fi
 BOID=`echo ${NETID} | cut -c12-16`
 BOADDR="bo_${BOID}"
 
+uci set backone.${NETID}=network
+uci set backone.${NETID}.id=${NETID}
+
 uci set network.${BOADDR}=interface
 uci set network.${BOADDR}.proto='none'
 uci set network.${BOADDR}.device="${NETADDR}"

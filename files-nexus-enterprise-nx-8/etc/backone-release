@@ -1,4 +1,4 @@
 . /etc/os-release
 
 BACKONE_MODEL="${NAME} Enterprise NX-8"
-BACKONE_BOARD_NAME="${ID}-enterprise-nx-6"
+BACKONE_BOARD_NAME="${ID}-enterprise-nx-8"

@@ -1,44 +1,44 @@
-
 config core 'main'
-	option lang 'auto'
-	option resourcebase '/luci-static/resources'
-	option ubuspath '/ubus/'
-	option mediaurlbase '/luci-static/material'
+        option lang 'auto'
+        option resourcebase '/luci-static/resources'
+        option ubuspath '/ubus/'
+        option mediaurlbase '/luci-static/material'
 
 config extern 'flash_keep'
-	option uci '/etc/config/'
-	option dropbear '/etc/dropbear/'
-	option openvpn '/etc/openvpn/'
-	option passwd '/etc/passwd'
-	option opkg '/etc/opkg.conf'
-	option firewall '/etc/firewall.user'
-	option uploads '/lib/uci/upload/'
+        option uci '/etc/config/'
+        option dropbear '/etc/dropbear/'
+        option openvpn '/etc/openvpn/'
+        option passwd '/etc/passwd'
+        option opkg '/etc/opkg.conf'
+        option firewall '/etc/firewall.user'
+        option uploads '/lib/uci/upload/'
 
 config internal 'languages'
+        option zh_cn '简体中文 (Chinese Simplified)'
 
 config internal 'sauth'
-	option sessionpath '/tmp/luci-sessions'
-	option sessiontime '3600'
+        option sessionpath '/tmp/luci-sessions'
+        option sessiontime '3600'
 
 config internal 'ccache'
-	option enable '1'
+        option enable '1'
 
 config internal 'themes'
-	option Bootstrap '/luci-static/bootstrap'
-	option BootstrapDark '/luci-static/bootstrap-dark'
-	option BootstrapLight '/luci-static/bootstrap-light'
-	option Material '/luci-static/material'
+        option Bootstrap '/luci-static/bootstrap'
+        option BootstrapDark '/luci-static/bootstrap-dark'
+        option BootstrapLight '/luci-static/bootstrap-light'
+        option Material '/luci-static/material'
 
 config internal 'apply'
-	option rollback '90'
-	option holdoff '4'
-	option timeout '5'
-	option display '1.5'
+        option rollback '90'
+        option holdoff '4'
+        option timeout '5'
+        option display '1.5'
 
 config internal 'diag'
-	option dns 'openwrt.org'
-	option ping 'openwrt.org'
-	option route 'openwrt.org'
+        option dns 'openwrt.org'
+        option ping 'openwrt.org'
+        option route 'openwrt.org'
 
 config command
         option param '0'
@@ -46,47 +46,16 @@ config command
         option command 'nexus-show'
 
 config command
-	option param '1'
-	option name 'Nexus Add Network'
-	option command 'nexus-add'
+        option param '1'
+        option name 'Nexus Add Network'
+        option command 'nexus-add'
 
 config command
-	option param '1'
-	option name 'Nexus Delete Network'
-	option command 'nexus-delete'
+        option param '1'
+        option name 'Nexus Delete Network'
+        option command 'nexus-delete'
 
 config command
-	option name 'Set Hostname'
-	option command 'set-hostname'
-	option param '1'
-
-config command
-	option name 'Set Password'
-	option command 'set-password'
-	option param '1'
-
-config command
-	option name 'WAF Set UUID'
-	option command 'nexus_waf_uuid'
-	option param '1'
-
-config command
-	option name 'WAF Set API'
-	option command 'nexus_waf_api'
-	option param '1'
-
-config command
-	option name 'WAF Show List'
-	option command 'nexus_waf_list'
-	option param '0'
-
-config command
-	option name 'WAF On (Add FW Redirection)'
-	option command 'nexus_waf_on'
-	option param '0'
-
-config command
-	option name 'WAF Off (Delete FW Redirection)'
-	option command 'nexus_waf_off'
-	option param '0'
-
+        option name 'Set Password'
+        option command 'set-password'
+        option param '1'

@@ -28,6 +28,7 @@ sleep 1
 BOID=`echo ${NETID} | cut -c12-16`
 BOADDR="bo_${BOID}"
 
+uci del backone.${NETID}
 uci del network.${BOADDR}
 uci commit
 
