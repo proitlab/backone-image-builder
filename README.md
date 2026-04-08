@@ -1,5 +1,5 @@
 # backone-image-builder
-## Nexus Pro + NX-6
+## Nexus Enterprise + NX-8
 
 ## To building up custom image from OpenWrt
 
