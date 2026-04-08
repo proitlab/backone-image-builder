@@ -2,38 +2,38 @@
 
 if [ "x$1" == "x" ]
 then
-	MQTT_SERVER=`uci get mqtt.presence.mqtt_server`
-	if [ "x$MQTT_SERVER" == "x" ]
-	then
-		echo "Please define the mqtt service in /etc/config/mqtt"
-		exit 0;
-	fi
+        MQTT_SERVER=`uci get mqtt.presence.mqtt_server`
+        if [ "x$MQTT_SERVER" == "x" ]
+        then
+                echo "Please define the mqtt service in /etc/config/mqtt"
+                exit 0;
+        fi
 else
-	MQTT_SERVER="$1"
+        MQTT_SERVER="$1"
 fi
 
 MQTT_TOPIC=`uci get mqtt.presence.mqtt_topic`
 if [ "x$MQTT_TOPIC" == "x" ]
 then
-	echo "MQTT_TOPIC is not define in /etc/config/mqtt. Used default"
-	MQTT_TOPIC="backone/presence"
+        echo "MQTT_TOPIC is not define in /etc/config/mqtt. Used default"
+        MQTT_TOPIC="backone/presence"
 fi
 MQTT_USER=`uci get mqtt.presence.mqtt_user`
 MQTT_PASS=`uci get mqtt.presence.mqtt_pass`
 MQTT_ID=`uci get mqtt.presence.mqtt_id`
 if [ "x$MQTT_ID" == "x" ]
 then
-	echo "MQTT_ID is not define in /etc/config/mqtt. Get Id."
-	MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
-	uci set mqtt.presence.mqtt_id=$MQTT_ID
-	uci commit
+        echo "MQTT_ID is not define in /etc/config/mqtt. Get Id."
+        MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
+        uci set mqtt.presence.mqtt_id=$MQTT_ID
+        uci commit
 else
-	BACKONE_MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
+        BACKONE_MQTT_ID=`cat /etc/backone/identity.secret | awk -F":" '{print $1}'`
   if [ $MQTT_ID != $BACKONE_MQTT_ID ]
   then
-	  echo "MQTT_ID (${MQTT_ID}) is NOT matched BACKONE_MQTT_ID (${BACKONE_MQTT_ID}). Fixing it."
-	  uci set mqtt.presence.mqtt_id=$BACKONE_MQTT_ID
-	  uci commit
+          echo "MQTT_ID (${MQTT_ID}) is NOT matched BACKONE_MQTT_ID (${BACKONE_MQTT_ID}). Fixing it."
+          uci set mqtt.presence.mqtt_id=$BACKONE_MQTT_ID
+          uci commit
   fi
 fi
 
@@ -47,7 +47,7 @@ RELEASE_TARGET=`ubus call system board | jsonfilter -e '@.release.target'`
 OVPN_IPADDR=`ip -j addr show tun0 2>&1 | jsonfilter -q -e '@[0]["addr_info"][0].local'`
 MQTT_RCALL=`ps | grep mqtt_rcall | grep -v grep | wc -l`
 UPTIME=`uptime`
-SERIALNUMBER=`get_serialnumber`
+SERIALNUMBER=$(ubus call system board | jsonfilter -e '@.release.distribution' | sed 's/ ((.*))/-1/')
 NUM_CORE=`cat /proc/cpuinfo | grep processor | wc -l`
 MEMORY_USAGE=`free | grep Mem | awk '{print $3/$2 * 100.0}'`
 
@@ -57,24 +57,24 @@ PACKET_LOSS=''
 ROUND_TRIP=''
 if [ -f $PING_LOG ]
 then
-	PACKET_LOSS=`cat $PING_LOG | grep "packet loss"`
-	ROUND_TRIP=`cat $PING_LOG | grep "round-trip"`
+        PACKET_LOSS=`cat $PING_LOG | grep "packet loss"`
+        ROUND_TRIP=`cat $PING_LOG | grep "round-trip"`
 
 fi
 
 if [ -f /usr/bin/get_switchport_up ]
 then
-	SWITCHPORT_UP=`get_switchport_up`
+        SWITCHPORT_UP=`get_switchport_up`
 fi
 
 if [ -f /usr/bin/get_port_status ]
 then
-	PORT_STATUS=`get_port_status`
+        PORT_STATUS=`get_port_status`
 fi
 
 if [ -f /usr/bin/get_vnstat ]
 then
-	VNSTAT_INFO=`get_vnstat`
+        VNSTAT_INFO=`get_vnstat`
 fi
 
 IPADDRESS_TS=`ip a show tailscale0 | grep "inet " | awk '{print $2}' | awk -F"/" '{print $1}'`
@@ -82,14 +82,14 @@ IPADDRESS_TS=`ip a show tailscale0 | grep "inet " | awk '{print $2}' | awk -F"/"
 # IS_WAF
 if [ -f /usr/bin/backone_waf_check ]
 then
-	IS_WAF=`backone_waf_check`
+        IS_WAF=`backone_waf_check`
 fi
 
 # RSSI
 RSSI_SIGNAL=99999
 if [ -f /usr/bin/get_signal_rssi ]
 then
-	RSSI_SIGNAL=`get_signal_rssi`
+        RSSI_SIGNAL=`get_signal_rssi`
 fi
 
 
