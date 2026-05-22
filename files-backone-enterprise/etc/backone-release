@@ -1,0 +1,4 @@
+. /etc/os-release
+
+BACKONE_MODEL="${NAME} Enterprise"
+BACKONE_BOARD_NAME="${ID}-enterprise"

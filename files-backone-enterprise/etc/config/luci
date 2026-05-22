@@ -13,9 +13,6 @@ config extern 'flash_keep'
         option firewall '/etc/firewall.user'
         option uploads '/lib/uci/upload/'
 
-config internal 'languages'
-        option zh_cn '简体中文 (Chinese Simplified)'
-
 config internal 'sauth'
         option sessionpath '/tmp/luci-sessions'
         option sessiontime '3600'
@@ -42,18 +39,18 @@ config internal 'diag'
 
 config command
         option param '0'
-        option name 'Nexus Status'
-        option command 'nexus-show'
+        option name 'BackOne Status'
+        option command 'backone-show'
 
 config command
         option param '1'
-        option name 'Nexus Add Network'
-        option command 'nexus-add'
+        option name 'BackOne Add Network'
+        option command 'backone-add'
 
 config command
         option param '1'
-        option name 'Nexus Delete Network'
-        option command 'nexus-delete'
+        option name 'BackOne Delete Network'
+        option command 'backone-delete'
 
 config command
         option name 'Set Password'

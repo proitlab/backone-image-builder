@@ -2,6 +2,6 @@
 config rtty
 	option port '5912'
 	option token 'dafc4fe50a0bc91555e689b19eae39ee'
-	option description 'backone_bvn/Ubiquiti EdgeRouter X'
+	option description 'backone-enterprise/BackOne Enterprise'
 	option host 'rtty.bvn.manage.backone.cloud'
 

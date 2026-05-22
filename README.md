@@ -1,5 +1,6 @@
 # backone-image-builder
-## Nexus Enterprise + NX-8
+
+## BackOne Enterprise
 
 ## To building up custom image from OpenWrt
 
@@ -10,10 +11,11 @@
 /usr/share/luci/menu.d/luci-base.json -> Add menu SDWAN
 /etc/opkg/distfeeds.conf -> Custom Repo
 
-
 # Compile option in make menuconfig
+
     Check make_menuconfig.png
 
 # Installer
+
 - Install with Image Builder 23.05.2
 - Use custom repo for nexus and netify packages
