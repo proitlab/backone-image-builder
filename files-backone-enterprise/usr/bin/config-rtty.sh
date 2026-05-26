@@ -8,7 +8,7 @@
 # --- EDIT THESE (UPDATED AS REQUESTED) ---
 ZTID="$(backone-cli info | awk '{print $3}')"
 ZTINF="$(ifconfig | grep zt | awk '{print $1}')"
-MYSERIALNUMBER=$(ubus call system board | jsonfilter -e '@.release.distribution' | sed 's/ ((.*))/-1/')
+MYSERIALNUMBER=$(ubus call system board | jsonfilter -e '@.release.revision' | sed 's/ ((.*))/-1/')
 HOSTNAME="$(uci get system.@system[0].hostname)"
 ZTIPADDR="$(ip -j addr show ${ZTINF} | jsonfilter -q -e '@[0]["addr_info"][0]["local"]')"
 MODEL="$(ubus call system board | jsonfilter -e '@.model')"

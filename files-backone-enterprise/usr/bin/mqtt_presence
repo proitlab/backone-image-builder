@@ -47,7 +47,7 @@ RELEASE_TARGET=`ubus call system board | jsonfilter -e '@.release.target'`
 OVPN_IPADDR=`ip -j addr show tun0 2>&1 | jsonfilter -q -e '@[0]["addr_info"][0].local'`
 MQTT_RCALL=`ps | grep mqtt_rcall | grep -v grep | wc -l`
 UPTIME=`uptime`
-SERIALNUMBER=$(ubus call system board | jsonfilter -e '@.release.distribution' | sed 's/ ((.*))/-1/')
+SERIALNUMBER=$(ubus call system board | jsonfilter -e '@.release.revision' | sed 's/ ((.*))/-1/')
 NUM_CORE=`cat /proc/cpuinfo | grep processor | wc -l`
 MEMORY_USAGE=`free | grep Mem | awk '{print $3/$2 * 100.0}'`
 
