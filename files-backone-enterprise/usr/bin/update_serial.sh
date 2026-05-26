@@ -22,18 +22,19 @@ fi
 # Combine SERIALNUMBER with MAC address (with parentheses)
 COMBINED="${SERIALNUMBER}-${MAC_RAW}"
 
-# Update DISTRIB_ID in /etc/openwrt_release
-if [ -f /etc/openwrt_release ]; then
-    # Check if DISTRIB_ID already exists
-    if grep -q "^DISTRIB_ID=" /etc/openwrt_release; then
+OS_RELEASE=/usr/lib/os-release
+# Update BUILD_ID in /etc/os-release
+if [ -f ${OS_RELEASE} ]; then
+    # Check if BUILD already exists
+    if grep -q "^BUILD_ID=" ${OS_RELEASE}; then
         # Replace existing DISTRIB_ID
-        sed -i "s/^DISTRIB_ID=.*/DISTRIB_ID='${COMBINED}'/" /etc/openwrt_release
+        sed -i "s/^BUILD_ID=.*/BUILD_ID='${COMBINED}'/" ${OS_RELEASE}
     else
         # Add DISTRIB_ID if it doesn't exist
-        echo "DISTRIB_ID='${COMBINED}'" >> /etc/openwrt_release
+        echo "BUILD_ID='${COMBINED}'" >> ${OS_RELEASE}
     fi
 else
-    echo "DISTRIB_ID='${COMBINED}'" > /etc/openwrt_release
+    echo "BUILD_ID='${COMBINED}'" > ${OS_RELEASE}
 fi
 
-echo "Updated DISTRIB_ID to: ${COMBINED}"
+echo "Updated BUILD_ID to: ${COMBINED}"

@@ -6,6 +6,9 @@
 echo $BACKONE_MODEL > /tmp/sysinfo/model
 echo $BACKONE_BOARD_NAME > /tmp/sysinfo/board_name
 
+# Update Serial Number
+/usr/bin/update_serial.sh ${NAME}
+
 # Configurations
 /usr/bin/config-rtty.sh
 /usr/bin/config-dnsmasq.sh
