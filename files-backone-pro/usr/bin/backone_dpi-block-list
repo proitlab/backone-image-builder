@@ -1,0 +1,34 @@
+#!/bin/sh
+
+LISTAPPS=`uci get dpi.block.application 2> /dev/null | sed 's/ /\n/g'`
+if [ "${LISTAPPS}" ]
+then
+	echo "--------------------"
+	echo "Blocked Applications"
+	echo "--------------------"
+	echo "${LISTAPPS}"
+	echo
+fi
+
+LISTAPPS=`uci get dpi.block.protocol 2> /dev/null`
+if [ "${LISTAPPS}" ]
+then
+	echo "-----------------"
+	echo "Blocked Protocols"
+	echo "-----------------"
+	echo ${LISTAPPS}
+	echo
+fi
+
+LISTAPPS=`uci get dpi.block.category 2> /dev/null`
+if [ "${LISTAPPS}" ]
+then
+	echo "------------------"
+	echo "Blocked Categories"
+	echo "------------------"
+	cat /etc/config/dpi | grep category | awk '{print $3, $4}'
+	#echo ${LISTAPPS}
+	echo
+fi
+
+echo "Fin!"

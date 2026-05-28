@@ -1,0 +1,115 @@
+#!/bin/bash
+
+function help_me {
+   echo "Usage:"
+   echo "   backone_dpi check - Checking DPI Feature in Controller"
+   echo "   backone_dpi license - Checking License"
+   echo "   backone_dpi config - Generate Config"
+   echo "   backone_dpi list - List Function"
+   echo "   backone_dpi block - Block Function"
+   echo "   backone_dpi unblock - Unblock Function"
+
+   exit 0;
+}
+
+function help_me_block {
+   echo "Usage:"
+   echo "   backone_dpi block list - View Block List"
+   echo "   backone_dpi block app [APP_NAME] - Block Application"
+   echo "   backone_dpi block proto [PROTOCOL_NAME] - Block Protocol"
+   echo "   backone_dpi block cat [CATEGORY_NAME] - Block Category"
+
+   exit 0;
+}
+
+function help_me_unblock {
+   echo "Usage:"
+   echo "   backone_dpi unblock app [APP_NAME] - Unblock Application"
+   echo "   backone_dpi unblock proto [PROTOCOL_NAME] - Unblock Protocol"
+   echo "   backone_dpi unblock cat [CATEGORY_NAME] - Unblock Category"
+
+   exit 0;
+}
+
+function help_me_list {
+   echo "Usage:"
+   echo "   backone_dpi list app [APP_NAME] - Search Application"
+   echo "   backone_dpi list proto [PROTOCOL_NAME] - Search Protocol"
+   echo "   backone_dpi list cat [CATEGORY_NAME] - Search Category"
+
+   exit 0;
+}
+
+SECOND=0
+THIRD=0
+
+case $1 in
+   check)
+      backone_dpi-check
+      ;;
+   license)
+      backone_dpi-license
+      ;;
+   config)
+      backone_dpi-config
+      ;;
+   list|block|unblock)
+      SECOND=1
+      ;;
+   *)
+      help_me
+esac 
+
+if [ ${SECOND} -eq 1 ]
+then
+   if [ "${2}" == "list" ]
+   then
+      backone_dpi-block-list
+      exit 0;
+   fi
+
+   if [ "x${2}" == "x" ]
+   then
+         case $1 in
+            list)
+               help_me_list
+               ;;
+            block)
+               help_me_block
+               ;;
+            unblock)
+               help_me_unblock
+               ;;
+            *)
+               help_me
+         esac
+   fi
+
+   case $2 in
+      app|proto|cat)
+         THIRD=1
+         ;;
+   esac
+fi
+
+if [ ${THIRD} -eq 1 ]
+then
+   if [ "x${3}" == "x" ]
+   then
+         case $1 in
+            list)
+               help_me_list
+               ;;
+            block)
+               help_me_block
+               ;;
+            unblock)
+               help_me_unblock
+               ;;
+            *)
+               help_me
+         esac
+   fi
+
+   backone_dpi-${1}-${2} ${3}
+fi

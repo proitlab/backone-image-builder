@@ -1,0 +1,50 @@
+#!/bin/ash
+
+CONTROLLER=`uci get dpi.config.controller 2> /dev/null`
+
+if [ "x${CONTROLLER}" == "x" ]
+then
+  echo "Please specify controller in dpi config"
+  exit 0;
+fi
+
+IS_ENABLED=`uci get dpi.config.enabled 2> /dev/null`
+MEMBER_ID=` backone-cli info | awk '{print $3}'`
+NETWORK_ID=`uci get dpi.config.network 2> /dev/null`
+
+if [ "x${NETWORK_ID}" == "x" ]
+then
+  echo "Try to get network_id from backone-cli..."
+  NETWORK_ID=`backone-cli listnetworks | grep OK | tail -1 | awk '{print $3}'`
+fi
+
+API_URI="https://${CONTROLLER}/api/members/get_member_by_net/${MEMBER_ID}/${NETWORK_ID}/"
+
+IS_DPI=`curl -s ${API_URI} | jq .is_dpi`
+
+case "${IS_DPI}" in
+  "true") echo "DPI is activated in Controller ${CONTROLLER}"
+  if [ ${IS_ENABLED} -eq 0 ]
+  then
+    uci set dpi.config.enabled=1
+    uci commit
+  fi
+  ;;
+  "false") echo "DPI is NOT activated in Controller ${CONTROLLER}"
+  if [ ${IS_ENABLED} -eq 1 ]
+  then
+    uci set dpi.config.enabled=0
+    uci commit
+  fi
+  ;;
+  "null") echo "Member id or network id is NOT exist in Controller ${CONTROLLER}"
+  if [ ${IS_ENABLED} -eq 1 ]
+  then
+    uci set dpi.config.enabled=0
+    uci commit
+  fi
+  ;;
+  *) echo "General Error"
+  ;;
+
+esac  

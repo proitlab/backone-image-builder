@@ -1,0 +1,55 @@
+#!/bin/ash
+
+IS_ENABLED=`uci get dpi.config.enabled 2> /dev/null`
+
+if [ ${IS_ENABLED} -eq 0 ]
+then
+   echo "DPI is NOT enabled in dpi config"
+   exit 0;
+fi
+
+LICENSE_FILE=/etc/netifyd/license.json
+LICENSE_FILE_TMP=/tmp/license.json.dpi
+
+UUID=`uci get dpi.config.uuid 2> /dev/null`
+
+if [ "x${UUID}" == "x" ]
+then
+   echo "Please define UUID"
+   exit 0;
+fi
+
+API_URI="https://lic.backone.cloud/api/licenses/dpi"
+
+curl -s "${API_URI}/${UUID}/" > ${LICENSE_FILE_TMP}
+
+SIGNATURE=""
+SIGNATURE_NEW=""
+
+if [ -f ${LICENSE_FILE} ]
+then
+   SIGNATURE=`cat ${LICENSE_FILE} | jq .signature 2> /dev/null`
+fi
+
+if [ -f ${LICENSE_FILE_TMP} ]
+then
+   SIGNATURE_NEW=`cat ${LICENSE_FILE_TMP} | jq .signature 2> /dev/null`
+fi
+
+if [ "x${SIGNATURE_NEW}" != "x" ]
+then
+   if [ ${SIGNATURE} != ${SIGNATURE_NEW} ]
+   then
+      echo "Update License with New License"
+      mv -f ${LICENSE_FILE_TMP} ${LICENSE_FILE}
+      /etc/init.d/netifyd restart
+   else
+      echo "Clear up temporary file"
+      rm -fr ${LICENSE_FILE_TMP}
+   fi
+else
+   echo "General Error!"
+   rm -fr ${LICENSE_FILE_TMP}
+fi
+
+echo "Fin!"

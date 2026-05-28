@@ -1,0 +1,78 @@
+#!/bin/sh
+IS_ENABLED=`uci get dpi.config.enabled 2> /dev/null`
+
+if [ ${IS_ENABLED} -eq 0 ]
+then
+   echo "DPI is NOT enabled in dpi config"
+   exit 0;
+fi
+
+if [ "x${1}" == "x" ]
+then
+   echo "Need at least one argument. Category Name."
+   exit 0;
+fi
+
+IS_THERE=`grep category /etc/config/dpi | grep "${1}" | wc -l`
+
+if [ ${IS_THERE} -eq 0 ]
+then
+   echo "Category ${1} is NOT in blocklist!"
+   exit 0;
+fi
+
+#LISTAPPCOUNT=`netifyd --dump-categories | grep ${1} | wc -l`
+
+#if [ ${LISTAPPCOUNT} -ne 1 ]
+#then
+        #echo "0 or more than 1 categories found. Please ensure just 1 category"
+        #exit 0;
+#fi
+
+
+#LISTAPP=`netifyd --dump-categories | grep ${1} | awk '{print $2, $3}'`
+
+for LISTAPP in `netifyd --dump-categories | grep ${1} | awk '{printf "%s%s\n", $2, $3}'`
+do
+
+  STATUS=0
+  if [ "x${LISTAPP}" != "x" ]
+  then
+      STATUS=1
+      LISTAPP_SPACE=`echo ${LISTAPP} | sed 's/:/: /g'`
+      echo "Removing category ${LISTAPP_SPACE} from blocklist..."
+      uci del_list dpi.block.category="${LISTAPP_SPACE}"
+      #uci commit
+
+      sleep 1
+
+      #echo "Updating configuration..."
+      #backone_dpi-config
+
+      #sleep 1
+
+      #echo "Restarting DPI Process..."
+      #/etc/init.d/netifyd restart
+  fi
+done
+      
+sleep 1
+
+if [ $STATUS == "1" ]
+then
+   echo "UCI Commit"
+   uci commit
+
+   sleep 1
+
+   echo "Updating configuration..."
+   backone_dpi-config
+
+   sleep 1
+   echo "Restarting DPI Process..."
+   /etc/init.d/netifyd restart
+
+   echo "Fin!"
+else
+   echo "Category ${1} is NOT in blocklist!"
+fi

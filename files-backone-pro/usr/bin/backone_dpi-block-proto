@@ -1,0 +1,56 @@
+#!/bin/sh
+
+IS_ENABLED=`uci get dpi.config.enabled 2> /dev/null`
+
+if [ ${IS_ENABLED} -eq 0 ]
+then
+   echo "DPI is NOT enabled in dpi config"
+   exit 0;
+fi
+
+if [ "x${1}" == "x" ]
+then
+   echo "Need at least one argument. Protocol Name!"
+   exit 0;
+fi
+
+for i in `uci get dpi.block.protocol 2> /dev/null`
+do
+	if [ "$i" == "$1" ]
+	then
+		echo "Protocol ${1} already in blocklist!"
+		exit 0;
+	fi
+done
+
+LISTAPP=`netifyd --dump-protos | grep ${1} | awk '{print $2}'`
+
+STATUS=0
+for i in ${LISTAPP}
+do
+   if [ "$i" == "$1" ]
+   then
+	   STATUS=1
+	   echo "Adding protocol ${1} into blocklist..."
+	   uci add_list dpi.block.protocol="${1}"
+	   uci commit
+
+	   sleep 1
+
+	   echo "Updating configuration..."
+	   backone_dpi-config
+
+	   sleep 1
+
+	   echo "Restarting DPI Process..."
+	   /etc/init.d/netifyd restart
+   fi
+
+done
+
+if [ $STATUS == "1" ]
+then
+   echo "Fin!"
+else
+   echo "Protocol ${1} is not found in DB!"
+fi

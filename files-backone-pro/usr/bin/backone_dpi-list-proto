@@ -1,0 +1,9 @@
+#!/bin/sh
+
+if [ "x${1}" == "x" ]
+then
+   echo "Need at least one argument. Application Name!"
+   exit 0;
+fi
+
+netifyd --dump-protos | grep -i ${1} | awk '{print $2}'
