@@ -1,0 +1,45 @@
+#!/bin/sh
+IS_ENABLED=`uci get dpi.config.enabled 2> /dev/null`
+
+if [ ${IS_ENABLED} -eq 0 ]
+then
+   echo "DPI is NOT enabled in dpi config"
+   exit 0;
+fi
+
+if [ "x${1}" == "x" ]
+then
+   echo "Need at least one argument. Application Name."
+   exit 0;
+fi
+
+STATUS=0
+for i in `uci get dpi.block.application 2> /dev/null`
+do
+   if [ "$i" == "$1" ]
+   then
+      STATUS=1
+      echo "Removing application ${1} from blocklist..."
+      uci del_list dpi.block.application="${1}"
+      uci commit
+
+      sleep 1
+
+      echo "Updating configuration..."
+      backone_dpi-config
+
+      sleep 1
+
+      echo "Restarting DPI Process..."
+      /etc/init.d/netifyd restart
+   fi
+done
+      
+sleep 1
+
+if [ $STATUS == "1" ]
+then
+   echo "Fin!"
+else
+   echo "Application ${1} is NOT in blocklist!"
+fi

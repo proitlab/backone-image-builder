@@ -14,4 +14,7 @@ echo $BACKONE_BOARD_NAME > /tmp/sysinfo/board_name
 /usr/bin/config-dnsmasq.sh
 /usr/bin/config-dropbear.sh
 
+# DPI
+/usr/bin/config-netify.sh
+
 exit 0

@@ -1,0 +1,115 @@
+#!/bin/bash
+
+nft delete table inet nfa
+clear
+
+echo "------------------"
+echo "DPI Initialization"
+echo "------------------"
+echo
+
+echo -n "Enter Controller: " 
+read CONTROLLER
+
+echo
+echo -n "Enter UUID: "
+read UUID
+
+echo
+echo -n "Enter Network ID: "
+read NETWORK
+
+echo
+echo "CONTROLLER=${CONTROLLER}"
+echo "UUID=${UUID}"
+echo "NETWORK=${NETWORK}"
+
+echo
+echo -n "Are they correct? (y/n)"
+read CONFIRM
+
+
+if [ ${CONFIRM} == [nN] ]
+then
+   echo "Fin!"
+   exit 0;
+fi
+
+uci set dpi.config.controller=${CONTROLLER}
+uci set dpi.config.uuid=${UUID}
+uci set dpi.config.network=${NETWORK}
+uci commit
+
+echo 
+echo "Save to dpi config"
+cat /etc/config/dpi | egrep "controller|network|uuid" | sed 's/^.//g'
+
+echo
+echo "Enable Plugins"
+/etc/init.d/netifyd stop
+echo -n "Stoping DPI daemon"
+for ((i=1; i<=10; i=i+1))
+do
+   echo -n "."
+   sleep 1
+done
+echo
+netifyd --enable-plugin proc-nfa
+netifyd --enable-plugin proc-core
+
+echo
+echo "Fix configuration"
+sed -i 's/true/false/g' /etc/netifyd/netify-proc-core.json
+sleep 1
+
+cat > /etc/netifyd/interfaces.d/10-brlan.conf << "EOF"
+[capture-interface-br-lan]
+capture_type = pcap
+role = lan
+EOF
+sleep 1
+
+echo
+echo "Check DPI feature in Controller ${CONTROLLER}"
+backone_dpi-check
+
+IS_ENABLED=`uci get dpi.config.enabled 2> /dev/null`
+
+if [ ${IS_ENABLED} -eq 0 ]
+then
+   exit 0;
+
+else
+   echo 
+   echo "Check DPI License"
+   backone_dpi-license
+   sleep 1
+
+   echo
+   echo "Adding nfa table in NetFilter"
+   nft add table inet nfa
+   sleep 1
+
+   echo
+   echo "Running DPI Config"
+   backone_dpi-config
+   sleep 1
+
+   echo
+   echo "Starting DPI daemon"
+   /etc/init.d/netifyd start
+   for ((i=1; i<=10; i=i+1))
+   do
+      echo -n "."
+      sleep 1
+   done
+
+   nft -f /etc/nftables.d/10-netify.nft.sh
+   echo "."
+   sleep 1
+
+   netifyd -s
+fi 
+
+echo
+echo "Fin!"

@@ -1,0 +1,190 @@
+#!/usr/bin/python3
+
+#
+# Copyright (C) 2022 Nethesis S.r.l.
+# SPDX-License-Identifier: GPL-2.0-only
+#
+
+from euci import EUci
+import json
+import subprocess
+#from nethsec import utils, users
+
+def get_interface_ips(interface):
+    ret = list()
+    try:
+        proc = subprocess.run(['/sbin/ifstatus', section], check=True, capture_output=True)
+        info = json.loads(proc.stdout)
+    except:
+        return ret
+
+    for ip_type in ('ipv4-address', 'ipv6-address'):
+        if ip_type in info:
+            for addr in info[ip_type]:
+                if 'address' in addr:
+                    ret.append(addr['address'])
+
+    return ret
+
+'''
+def user_to_criteria(uci, user):
+    criteria = []
+    (ipv4, ipv6) = users.get_user_addresses(uci, user)
+    return entries_to_criteria(ipv4, ipv6, users.get_user_macs(uci, user))
+
+def group_to_criteria(uci, group):
+    criteria = []
+    (ipv4, ipv6) = users.get_group_addresses(uci, group)
+    return entries_to_criteria(ipv4, ipv6, users.get_group_macs(uci, group))
+'''
+
+def entries_to_criteria(ipv4, ipv6, macs):
+    criteria = []
+    for mac in macs:
+        criteria.append(f"(local_mac == {mac})")
+    for ip in ipv4:
+        criteria.append(f"(local_ip == {ip} and ip_version == 4)")
+    for ip in ipv6:
+        criteria.append(f"(local_ip == {ip} and ip_version == 6)")
+    return " or ".join(criteria)
+
+
+#cfg_file = "/etc/backone/netify-proc-flow-actions.json"
+cfg_file = "/etc/netifyd/netify-proc-flow-actions.json"
+
+config = {
+    "version": 1,
+    "targets": {},
+    "target_defaults": {
+        "log": {
+            "path": "/tmp",
+            "prefix": "netify-flow-actions",
+            "suffix": ".json",
+            "interval": 60
+        },
+        "ipset": {
+            "set_family": "*",
+            "ttl": 120
+        }
+    },
+    "target_globals": {
+    },
+    "actions": {},
+    "exemptions": [
+        "192.168.1.1",
+        "protocol == 'dns';"
+    ]
+}
+
+
+# Add firewall IP address as global exemptions
+u = EUci()
+if u.get('dpi', 'config', 'firewall_exemption', default=0) == '1':
+    for section in u.get_all('network'):
+        if u.get('network', section) == 'interface':
+            ip_addrs = get_interface_ips(section)
+            if ip_addrs:
+                config["exemptions"] = config["exemptions"] + ip_addrs
+
+# Add custom global exemptions
+'''
+exemptions = utils.get_all_by_type(u, 'dpi', 'exemption')
+for ex_name in exemptions:
+    exemption = exemptions[ex_name]
+    criteria = exemption.get('criteria', '')
+    enabled = exemption.get('enabled', '1')
+    if enabled == '1' and criteria:
+        config["exemptions"].append(criteria)
+'''
+
+rcount = 0
+#valid_actions = ['block', 'bulk', 'best_effort', 'video', 'voice']
+valid_actions = ['log.block', 'nfa.block']
+for section in u.get_all('dpi'):
+    if u.get('dpi', section) != 'rule':
+        continue
+    rule = u.get_all('dpi', section)
+
+    #if rule['action'] not in valid_actions or not rule['enabled']:
+    if not rule['enabled']:
+        continue
+
+    actions = []
+    for action in rule.get('action', []):
+        actions.append(action)
+
+    if 'criteria' in rule:
+        # criteria has precedence over sources, protocol, category and application
+        criteria = rule['criteria'].replace('"',"'")
+    else:
+        # generate criteria from source, protocol, category and application
+        sources = []
+        for source in rule.get('source', []):
+            if source.startswith("user:"):
+                usr = user_to_criteria(u, source[5:])
+                if usr:
+                    sources.append(usr)
+            elif source.startswith("group:"):
+                grp = group_to_criteria(u, source[5:])
+                if grp:
+                    sources.append(grp)
+            else: # custom local IPs
+                sources.append(f'local_ip == {source}')
+
+        applications = []
+        for app in rule.get('application', []):
+            applications.append(f"app == '{app}'")
+        for proto in rule.get('protocol', []):
+            applications.append(f"proto == '{proto.lower()}'")
+        for cat in rule.get('category', []):
+            applications.append(f"category == '{cat.lower()}'")
+	
+        sources_s = ' or '.join(sources)
+        applications_s = ' or '.join(applications)
+        if len(sources) < 1:
+            criteria = f'({applications_s}) ;'
+        elif len(applications) < 1:
+            criteria = f'({sources_s}) ;'
+        else:
+            criteria = f'({sources_s}) && ({applications_s}) ;'
+
+#    config["actions"][f"rule{rcount}"] = {
+
+    # Define Targets log.block
+    config["targets"]["log.block"] = {
+	"target_type": "log",
+	"target_enabled": 1 == 1,
+	"prefix": "netify-block",
+	"interval": 60
+    }
+
+    # Define Targets nfa.block
+    nfa_block_type = [ "local_addr", "other_port", "other_addr"]
+    config["targets"]["nfa.block"] = {
+	"target_name": "nfa_block",
+	"target_type": "nftset",
+	"set_name": "nfa_block",
+	"set_family": "ipv4",
+	"type": nfa_block_type,
+	"ttl": 120,
+	"managed": 1 == 1,
+	"flush_on_create": 1 == 1
+    }
+
+    # Define actions
+    config["actions"]["block"] = {
+        "enabled": rule['enabled'] == '1',
+        "interface": rule.get('device', '*'),
+        "criteria": criteria,
+        "targets": actions
+    }
+'''
+    config["targets"][rule['action']] = {
+        "target_type": "ctlabel",
+        "labels": [rule['action']]
+    }
+    rcount = rcount + 1
+'''
+
+with open(cfg_file, 'w') as fp:
+    json.dump(config, fp)
